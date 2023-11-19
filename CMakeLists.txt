@@ -28,31 +28,6 @@ add_subdirectory(tools)
 
 
 # Testing and Benchmarking
-include(FetchContent)
-if(${CMAKE_VERSION} VERSION_LESS "3.25")
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
-FetchContent_Declare(googlebenchmark
-  GIT_REPOSITORY https://github.com/google/benchmark.git
-  GIT_TAG main
-)
-else()
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-  DOWNLOAD_EXTRACT_TIMESTAMP true
-)
-FetchContent_Declare(googlebenchmark
-  GIT_REPOSITORY https://github.com/google/benchmark.git
-  GIT_TAG main
-  DOWNLOAD_EXTRACT_TIMESTAMP true
-)
-endif()
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest googlebenchmark)
 
 enable_testing()
 set(ALL_TESTS CACHE PATH "" FORCE)
@@ -66,14 +41,14 @@ add_custom_target(unittests
   DEPENDS ${ALL_TESTS}
 )
 
-# add_subdirectory(benchmarks)
-# FIXME: include on subdirectory
+set(ALL_BENCHMARKS CACHE PATH "" FORCE)
+add_subdirectory(benchmarks)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/benchmark)
-add_executable(benchm benchmark/benchmark.cpp)
-target_link_libraries(benchm benchmark::benchmark)
 
-add_custom_target(bench
-  COMMAND ${CMAKE_BINARY_DIR}/benchmark/benchm
-  DEPENDS benchm benchmark::benchmark benchmark/benchmark.cpp
-)
+foreach(benchmark ${ALL_BENCHMARKS})
+  get_filename_component(benchmark_name ${benchmark} NAME_WE)
+  add_custom_target(benchmark-${benchmark_name}
+    COMMAND ${CMAKE_BINARY_DIR}/benchmarks/${benchmark_name}
+    DEPENDS ${benchmark}
+  )
+endforeach()
