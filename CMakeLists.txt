@@ -45,10 +45,10 @@ set(ALL_BENCHMARKS CACHE PATH "" FORCE)
 add_subdirectory(benchmarks)
 
 
-foreach(benchmark ${ALL_BENCHMARKS})
-  get_filename_component(benchmark_name ${benchmark} NAME_WE)
-  add_custom_target(benchmark-${benchmark_name}
-    COMMAND ${CMAKE_BINARY_DIR}/benchmarks/${benchmark_name}
-    DEPENDS ${benchmark}
+foreach(BENCH_NAME ${ALL_BENCHMARKS})
+  message(STATUS "Adding benchmark-${BENCH_NAME}")
+  add_custom_target(benchmark-${BENCH_NAME}
+    COMMAND ${CMAKE_BINARY_DIR}/benchmarks/${BENCH_NAME}
+    DEPENDS ${BENCH_NAME}
   )
 endforeach()

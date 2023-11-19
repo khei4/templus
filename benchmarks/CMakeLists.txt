@@ -17,9 +17,16 @@ FetchContent_MakeAvailable(googlebenchmark)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/benchmarks)
 
 # each benchmark is a separate executable
-add_executable(bench1 benchmark1.cpp)
-target_link_libraries(bench1 benchmark::benchmark)
-list(APPEND ALL_BENCHMARKS bench1)
+
+
+file(GLOB BENCH_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/benchmarks/*.cpp)
+file(GLOB TEST_SOURCES CONFIGURE_DEPENDS *.cpp)
+foreach(BENCH_SRC ${BENCH_SOURCES})
+  get_filename_component(BENCH_NAME ${BENCH_SRC} NAME_WE)
+  add_executable(${BENCH_NAME} ${BENCH_SRC})
+  target_link_libraries(${BENCH_NAME} benchmark::benchmark)
+  list(APPEND ALL_BENCHMARKS ${BENCH_NAME})
+endforeach()
 
 
 
